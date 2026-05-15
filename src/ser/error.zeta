@@ -1,0 +1,81 @@
+// Auto-converted from /tmp/df-toml-1.1.2+spec-1.1.0/toml-1.1.2+spec-1.1.0/src/ser/error.rs
+
+use crate::alloc_prelude::*;
+/// Errors that can occur when serializing a type.
+#[derive(Clone, PartialEq, Eq)]
+pub struct Error {
+ inner: ErrorInner,
+}
+
+impl Error {
+ fn new(inner: impl core::fmt::Display) -> Self {
+ Self { inner: ErrorInner::Custom(inner.to_string()) }
+ }
+ 
+ fn unsupported_type(t: Option<&str>) -> Self {
+ Self { inner: ErrorInner::UnsupportedType(t) }
+ }
+ 
+ fn unsupported_none() -> Self {
+ Self { inner: ErrorInner::UnsupportedNone }
+ }
+ 
+ fn key_not_string() -> Self {
+ Self { inner: ErrorInner::KeyNotString }
+ }
+ 
+ fn date_invalid() -> Self {
+ Self { inner: ErrorInner::DateInvalid }
+ }
+ 
+}
+
+impl From<core::fmt::Error> for Error {
+ fn from(_: core::fmt::Error) -> Self {
+ Self::new("an error occurred when writing a value")
+ }
+ 
+}
+
+impl serde_core::ser::Error for Error {
+ fn custom(msg: T) -> Self {
+ Self::new(msg)
+ }
+ 
+}
+
+impl core::fmt::Display for Error {
+ fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+ self.inner.fmt(f)
+ }
+ 
+}
+
+impl core::fmt::Debug for Error {
+ fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+ self.inner.fmt(f)
+ }
+ 
+}
+
+impl core::error::Error for Error {
+}
+
+/// Errors that can occur when deserializing a type.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+enum ErrorInner {
+ UnsupportedType(Option<&str>),
+ UnsupportedNone,
+ KeyNotString,
+ DateInvalid,
+ Custom(String),
+}
+
+impl core::fmt::Display for ErrorInner {
+ fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+ match self { Self::UnsupportedType(Some(t)) => write!(formatter, "unsupported {t} type"), Self::UnsupportedType(None) => write!(formatter, "unsupported rust type"), Self::UnsupportedNone => "unsupported None value" . fmt(formatter), Self::KeyNotString => "map key was not a string" . fmt(formatter), Self::DateInvalid => "a serialized date was invalid" . fmt(formatter), Self::Custom(s) => s.fmt(formatter) }
+ }
+ 
+}
+

@@ -1,0 +1,100 @@
+// Auto-converted from /tmp/df-toml-1.1.2+spec-1.1.0/toml-1.1.2+spec-1.1.0/src/de/parser/debug.rs
+
+struct TraceScope {
+ text: String,
+ style: anstyle::Style,
+ guard: DebugDepthGuard,
+}
+
+impl TraceScope {
+ fn new(text: impl core::fmt::Display) -> Self {
+ let text = text.to_string();
+ let style = anstyle::Style::new();
+ trace(&format!("> {text}"), style);
+ Self { text, style, guard: DEBUG_DEPTH.scoped() }
+ }
+ 
+}
+
+impl Drop for TraceScope {
+ fn drop(&mut self) {
+ let text = &self.text;
+ let style = self.style;
+ drop(self.guard.take());
+ trace(&format!("< {text}"), style);
+ }
+ 
+}
+
+fn trace(text: &str, style: anstyle::Style) {
+ let depth = DEBUG_DEPTH.depth();
+ anstream::eprintln!("{:depth$}{style}{text}{style:#}", "")
+}
+
+struct DebugDepth {
+ (core::sync::atomic::AtomicUsize),
+}
+
+impl DebugDepth {
+ fn scoped(&self) -> DebugDepthGuard {
+ DebugDepthGuard::new()
+ }
+ 
+ fn enter_unchecked(&self) -> usize {
+ self.0.fetch_add(1, core::sync::atomic::Ordering::SeqCst)
+ }
+ 
+ fn exit_unchecked(&self) {
+ let _ = self.0.fetch_sub(1, core::sync::atomic::Ordering::SeqCst);
+ }
+ 
+ fn depth(&self) -> usize {
+ self.0.load(core::sync::atomic::Ordering::SeqCst)
+ }
+ 
+}
+
+static DEBUG_DEPTH: DebugDepth = DebugDepth(core::sync::atomic::AtomicUsize::new(0));
+
+struct DebugDepthGuard {
+ depth: usize,
+ inc: bool,
+}
+
+impl DebugDepthGuard {
+ fn new() -> Self {
+ let depth = DEBUG_DEPTH.enter_unchecked();
+ Self { depth, inc: true }
+ }
+ 
+ fn take(&mut self) -> Self {
+ let depth = self.depth;
+ let inc = self.inc;
+ self.inc = false;
+ Self { depth, inc }
+ }
+ 
+}
+
+impl Drop for DebugDepthGuard {
+ fn drop(&mut self) {
+ if self.inc { DEBUG_DEPTH.exit_unchecked(); }
+ }
+ 
+}
+
+impl AsRef<usize> for DebugDepthGuard {
+ fn as_ref(&self) -> &usize {
+ &self.depth
+ }
+ 
+}
+
+impl core::ops::Deref for DebugDepthGuard {
+ type Target = usize;
+ fn deref(&self) -> &Self::Target {
+ &self.depth
+ }
+ 
+}
+

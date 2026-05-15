@@ -1,0 +1,32 @@
+// Auto-converted from /tmp/df-toml-1.1.2+spec-1.1.0/toml-1.1.2+spec-1.1.0/src/lib.rs
+
+// [unsupported item]
+mod alloc_prelude {
+ pub(crate) use alloc::borrow::ToOwned as _;
+ pub(crate) use alloc::format;
+ pub(crate) use alloc::string::String;
+ pub(crate) use alloc::string::ToString as _;
+ pub(crate) use alloc::vec::Vec
+}
+
+pub mod map;
+#[cfg(feature = "serde")]
+pub mod value;
+pub mod de;
+#[cfg(feature = "serde")]
+pub mod ser;
+#[cfg(feature = "serde")]
+pub mod macros;
+#[cfg(feature = "serde")]
+mod table;
+#[doc(inline)] #[cfg(feature = "parse")] #[cfg(feature = "serde")] pub use crate::de::{ Deserializer, from_slice, from_str };
+#[doc(inline)] #[cfg(feature = "display")] #[cfg(feature = "serde")] pub use crate::ser::{ Serializer, to_string, to_string_pretty };
+#[doc(inline)] #[cfg(feature = "serde")] pub use crate::value::Value;
+pub use serde_spanned::Spanned;
+#[cfg(feature = "serde")] pub use table::Table;
+#[allow(unused_imports)] use core::str::FromStr;
+#[allow(unused_imports)] use toml_datetime::Datetime;
+#[cfg(doctest)]
+pub struct ReadmeDoctests {
+}
+

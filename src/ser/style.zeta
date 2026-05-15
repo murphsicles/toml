@@ -1,0 +1,7 @@
+// Auto-converted from /tmp/df-toml-1.1.2+spec-1.1.0/toml-1.1.2+spec-1.1.0/src/ser/style.rs
+
+#[derive(Copy, Clone, Default)]
+struct Style {
+ multiline_array: bool,
+}
+

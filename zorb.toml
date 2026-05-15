@@ -1,0 +1,7 @@
+[package]
+name = "@encoding/toml"
+version = "zeta_out"
+description = "TOML parsing/encoding for Zeta"
+license = "MIT"
+repository = "https://github.com/murphsicles/toml"
+readme = "README.md"

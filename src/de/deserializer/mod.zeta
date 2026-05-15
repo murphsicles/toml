@@ -1,0 +1,100 @@
+// Auto-converted from /tmp/df-toml-1.1.2+spec-1.1.0/toml-1.1.2+spec-1.1.0/src/de/deserializer/mod.rs
+
+mod array;
+mod key;
+mod table;
+mod table_enum;
+mod value;
+pub use value::ValueDeserializer;
+use crate::de::DeTable;
+use crate::de::DeValue;
+use crate::de::Error;
+use array::ArrayDeserializer;
+use key::KeyDeserializer;
+use serde_spanned::Spanned;
+use serde_spanned::de::SpannedDeserializer;
+use table::TableDeserializer;
+use table_enum::TableEnumDeserializer;
+use toml_datetime::de::DatetimeDeserializer;
+/// Deserialization for TOML [documents][crate::Table].
+/// 
+/// To deserializes TOML values, instead of documents, see [`ValueDeserializer`].
+pub struct Deserializer<i> {
+ span: core::ops::Range<usize>,
+ root: DeTable<'i>,
+ raw: Option<&str>,
+}
+
+impl<i> Deserializer<'i> {
+ pub fn parse(raw: &str) -> Result<Self, Error> {
+ let root = DeTable::parse(raw) ?;
+ let span = root.span();
+ let root = root.into_inner();
+ Ok(Self { span, root, raw: Some(raw) })
+ }
+ 
+ pub fn new(raw: &str) -> Result<Self, Error> {
+ Self::parse(raw)
+ }
+ 
+ fn into_table_de(self) -> ValueDeserializer<'i> {
+ ValueDeserializer::with_parts(DeValue::Table(self.root), self.span)
+ }
+ 
+}
+
+impl<i> From<Spanned<DeTable<'i>>> for Deserializer<'i> {
+ fn from(root: Spanned<DeTable<'i>>) -> Self {
+ let span = root.span();
+ let root = root.into_inner();
+ Self { span, root, raw: None }
+ }
+ 
+}
+
+impl<de> serde_core::Deserializer<de> for Deserializer<'de> {
+ type Error = Error;
+ fn deserialize_any(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let raw = self.raw;
+ self.into_table_de().deserialize_any(visitor).map_err(| mut e: Self::Error | { e.set_input(raw); e })
+ }
+ 
+ fn deserialize_option(self, visitor: V) -> Result<V::Value, Error> {
+ let raw = self.raw;
+ self.into_table_de().deserialize_option(visitor).map_err(| mut e: Self::Error | { e.set_input(raw); e })
+ }
+ 
+ fn deserialize_newtype_struct(self, name: &str, visitor: V) -> Result<V::Value, Error> {
+ let raw = self.raw;
+ self.into_table_de().deserialize_newtype_struct(name, visitor).map_err(| mut e: Self::Error | { e.set_input(raw); e })
+ }
+ 
+ fn deserialize_struct(self, name: &str, fields: &[&str], visitor: V) -> Result<V::Value, Error> {
+ let raw = self.raw;
+ self.into_table_de().deserialize_struct(name, fields, visitor).map_err(| mut e: Self::Error | { e.set_input(raw); e })
+ }
+ 
+ fn deserialize_enum(self, name: &str, variants: &[&str], visitor: V) -> Result<V::Value, Error> {
+ let raw = self.raw;
+ self.into_table_de().deserialize_enum(name, variants, visitor).map_err(| mut e: Self::Error | { e.set_input(raw); e })
+ }
+ 
+ // [unsupported impl item]
+}
+
+impl<de> serde_core::de::IntoDeserializer<de, Error> for Deserializer<'de> {
+ type Deserializer = Self;
+ fn into_deserializer(self) -> Self::Deserializer {
+ self
+ }
+ 
+}
+
+impl<de> serde_core::de::IntoDeserializer<de, Error> for Spanned<DeTable<'de>> {
+ type Deserializer = Deserializer<'de>;
+ fn into_deserializer(self) -> Self::Deserializer {
+ Deserializer::from(self)
+ }
+ 
+}
+

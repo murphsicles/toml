@@ -1,0 +1,150 @@
+// Auto-converted from /tmp/df-toml-1.1.2+spec-1.1.0/toml-1.1.2+spec-1.1.0/src/de/deserializer/key.rs
+
+use serde_core::de::IntoDeserializer;
+use crate::de::DeString;
+use crate::de::Error;
+struct KeyDeserializer<i> {
+ span: Option<core::ops::Range<usize>>,
+ key: DeString<'i>,
+}
+
+impl<i> KeyDeserializer<'i> {
+ fn new(key: DeString<'i>, span: Option<core::ops::Range<usize>>) -> Self {
+ KeyDeserializer { span, key }
+ }
+ 
+}
+
+impl<de> IntoDeserializer<de, Error> for KeyDeserializer<'de> {
+ type Deserializer = Self;
+ fn into_deserializer(self) -> Self::Deserializer {
+ self
+ }
+ 
+}
+
+impl<de> serde_core::de::Deserializer<de> for KeyDeserializer<'de> {
+ type Error = Error;
+ fn deserialize_any(self, visitor: V) -> Result<V::Value, Error> {
+ self.key.into_deserializer().deserialize_any(visitor)
+ }
+ 
+ fn deserialize_bool(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_bool(visitor)
+ }
+ 
+ fn deserialize_i8(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_i8(visitor)
+ }
+ 
+ fn deserialize_i16(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_i16(visitor)
+ }
+ 
+ fn deserialize_i32(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_i32(visitor)
+ }
+ 
+ fn deserialize_i64(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_i64(visitor)
+ }
+ 
+ fn deserialize_i128(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_i128(visitor)
+ }
+ 
+ fn deserialize_u8(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_u8(visitor)
+ }
+ 
+ fn deserialize_u16(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_u16(visitor)
+ }
+ 
+ fn deserialize_u32(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_u32(visitor)
+ }
+ 
+ fn deserialize_u64(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_u64(visitor)
+ }
+ 
+ fn deserialize_u128(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_u128(visitor)
+ }
+ 
+ fn deserialize_char(self, visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = self.key.parse().map_err(serde_core::de::Error::custom) ?;
+ key.into_deserializer().deserialize_char(visitor)
+ }
+ 
+ fn deserialize_str(self, visitor: V) -> Result<V::Value, Self::Error> {
+ match self.key { DeString::Borrowed(s) => visitor.visit_borrowed_str(s), DeString::Owned(s) => visitor.visit_string(s) }
+ }
+ 
+ fn deserialize_enum(self, name: &str, variants: &[&str], visitor: V) -> Result<V::Value, Self::Error> {
+ let _ = name;
+ let _ = variants;
+ visitor.visit_enum(self)
+ }
+ 
+ fn deserialize_struct(self, name: &str, _fields: &[&str], visitor: V) -> Result<V::Value, Error> {
+ if serde_spanned::de::is_spanned(name) { if let Some(span) = self.span.clone() { return visitor.visit_map(super::SpannedDeserializer::new(self.key, span)); } else { return Err(Error::custom("value is missing a span", None)); } }
+ self.deserialize_any(visitor)
+ }
+ 
+ fn deserialize_newtype_struct(self, _name: &str, visitor: V) -> Result<V::Value, Error> {
+ visitor.visit_newtype_struct(self)
+ }
+ 
+ // [unsupported impl item]
+}
+
+impl<de> serde_core::de::EnumAccess<de> for KeyDeserializer<'de> {
+ type Error = Error;
+ type Variant = UnitOnly<Self::Error>;
+ fn variant_seed(self, seed: T) -> Result<(T::Value, Self::Variant), Self::Error> {
+ seed.deserialize(self).map(unit_only)
+ }
+ 
+}
+
+struct UnitOnly<E> {
+ marker: core::marker::PhantomData<E>,
+}
+
+fn unit_only<T, E>(t: T) ->(T, UnitOnly<E>) {
+ (t, UnitOnly { marker: core::marker::PhantomData } )
+}
+
+impl<de, E> serde_core::de::VariantAccess<de> for UnitOnly<E> where E: serde_core::de::Error {
+ type Error = E;
+ fn unit_variant(self) -> Result<(), Self::Error> {
+ Ok(())
+ }
+ 
+ fn newtype_variant_seed(self, _seed: T) -> Result<T::Value, Self::Error> {
+ Err(serde_core::de::Error::invalid_type(serde_core::de::Unexpected::UnitVariant, & "newtype variant" ))
+ }
+ 
+ fn tuple_variant(self, _len: usize, _visitor: V) -> Result<V::Value, Self::Error> {
+ Err(serde_core::de::Error::invalid_type(serde_core::de::Unexpected::UnitVariant, & "tuple variant" ))
+ }
+ 
+ fn struct_variant(self, _fields: &[&str], _visitor: V) -> Result<V::Value, Self::Error> {
+ Err(serde_core::de::Error::invalid_type(serde_core::de::Unexpected::UnitVariant, & "struct variant" ))
+ }
+ 
+}
+

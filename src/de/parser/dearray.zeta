@@ -1,0 +1,124 @@
+// Auto-converted from /tmp/df-toml-1.1.2+spec-1.1.0/toml-1.1.2+spec-1.1.0/src/de/parser/dearray.rs
+
+use serde_spanned::Spanned;
+use crate::alloc_prelude::*;
+use crate::de::DeValue;
+/// Type representing a TOML array, payload of the `DeValue::Array` variant
+#[derive(Clone)]
+pub struct DeArray<i> {
+ items: Vec<Spanned<DeValue<'i>>>,
+ array_of_tables: bool,
+}
+
+impl<i> DeArray<'i> {
+ pub fn new() -> Self {
+ Self { items: Vec::new(), array_of_tables: false }
+ }
+ 
+ pub fn push(&mut self, value: Spanned<DeValue<'i>>) {
+ self.items.push(value);
+ }
+ 
+}
+
+impl DeArray<'_> {
+ fn is_array_of_tables(&self) -> bool {
+ self.array_of_tables
+ }
+ 
+ fn set_array_of_tables(&mut self, yes: bool) {
+ self.array_of_tables = yes;
+ }
+ 
+}
+
+impl<i> core::ops::Deref for DeArray<'i> {
+ type Target = [Spanned<DeValue<'i>>];
+ fn deref(&self) -> &[Spanned<DeValue<'i>>] {
+ self.items.as_slice()
+ }
+ 
+}
+
+impl<i> core::ops::DerefMut for DeArray<'i> {
+ fn deref_mut(&mut self) -> &mut [Spanned<DeValue<'i>>] {
+ self.items.as_mut_slice()
+ }
+ 
+}
+
+impl<i> AsRef<[Spanned<DeValue<'i>>]> for DeArray<'i> {
+ fn as_ref(&self) -> &[Spanned<DeValue<'i>>] {
+ &self.items
+ }
+ 
+}
+
+impl<i> AsMut<[Spanned<DeValue<'i>>]> for DeArray<'i> {
+ fn as_mut(&mut self) -> &mut [Spanned<DeValue<'i>>] {
+ &mut self.items
+ }
+ 
+}
+
+impl<i> core::borrow::Borrow<[Spanned<DeValue<'i>>]> for DeArray<'i> {
+ fn borrow(&self) -> &[Spanned<DeValue<'i>>] {
+ &self.items [..]
+ }
+ 
+}
+
+impl<i> core::borrow::BorrowMut<[Spanned<DeValue<'i>>]> for DeArray<'i> {
+ fn borrow_mut(&mut self) -> &mut [Spanned<DeValue<'i>>] {
+ &mut self.items [..]
+ }
+ 
+}
+
+impl<i, I: core::slice::SliceIndex<[Spanned<DeValue<'i>>]>> core::ops::Index<I> for DeArray<'i> {
+ type Output = I::Output;
+ fn index(&self, index: I) -> &Self::Output {
+ self.items.index(index)
+ }
+ 
+}
+
+impl<a, i> IntoIterator for &DeArray<'i> {
+ type Item = &Spanned<DeValue<'i>>;
+ type IntoIter = core::slice::Iter<'a, Spanned<DeValue<'i>>>;
+ fn into_iter(self) -> Self::IntoIter {
+ self.iter()
+ }
+ 
+}
+
+impl<i> IntoIterator for DeArray<'i> {
+ type Item = Spanned<DeValue<'i>>;
+ type IntoIter = alloc::vec::IntoIter<Spanned<DeValue<'i>>>;
+ fn into_iter(self) -> Self::IntoIter {
+ self.items.into_iter()
+ }
+ 
+}
+
+impl<i> FromIterator<Spanned<DeValue<'i>>> for DeArray<'i> {
+ fn from_iter(iter: I) -> Self {
+ Self { items: iter.into_iter().collect(), array_of_tables: false }
+ }
+ 
+}
+
+impl Default for DeArray<'static> {
+ fn default() -> Self {
+ Self { items: Default::default(), array_of_tables: false }
+ }
+ 
+}
+
+impl core::fmt::Debug for DeArray<'_> {
+ fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+ self.items.fmt(formatter)
+ }
+ 
+}
+
